@@ -7,7 +7,6 @@ import time
 
 import numpy as np
 import torch
-from torch.nn.parallel import DistributedDataParallel as DDP
 from tqdm import tqdm
 
 from ultralytics import YOLO
@@ -22,7 +21,12 @@ def get_weight_size(path):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--weights", type=str, default="/home/bei-top/yolo_prune/ultralytics/runs/detect/train14/weights/best.pt", help="trained weights path")
+    parser.add_argument(
+        "--weights",
+        type=str,
+        default="/home/bei-top/yolo_prune/ultralytics/runs/detect/train14/weights/best.pt",
+        help="trained weights path",
+    )
     parser.add_argument("--batch", type=int, default=32, help="total batch size for all GPUs")
     parser.add_argument("--imgs", nargs="+", type=int, default=[640, 640], help="[height, width] image sizes")
     parser.add_argument("--device", default="", help="cuda device, i.e. 0 or 0,1,2,3 or cpu")
@@ -71,6 +75,10 @@ if __name__ == "__main__":
     infer_time_per_image = np.sum(time_arr) / (opt.testtime * opt.batch)
 
     if weights.endswith(".pt"):
-        print(f"model weights:{opt.weights} size:{get_weight_size(opt.weights)}M (bs:{opt.batch})Latency:{infer_time_per_image:.5f}s +- {std_time:.5f}s fps:{1 / infer_time_per_image:.1f}")
+        print(
+            f"model weights:{opt.weights} size:{get_weight_size(opt.weights)}M (bs:{opt.batch})Latency:{infer_time_per_image:.5f}s +- {std_time:.5f}s fps:{1 / infer_time_per_image:.1f}"
+        )
     else:
-        print(f"model yaml:{opt.weights} (bs:{opt.batch})Latency:{infer_time_per_image:.5f}s +- {std_time:.5f}s fps:{1 / infer_time_per_image:.1f}")
+        print(
+            f"model yaml:{opt.weights} (bs:{opt.batch})Latency:{infer_time_per_image:.5f}s +- {std_time:.5f}s fps:{1 / infer_time_per_image:.1f}"
+        )
