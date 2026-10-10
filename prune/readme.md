@@ -45,15 +45,15 @@ python prune.py --model_path yolov8n.pt --data coco8.yaml --speed_up 2.0 --prune
 
 **Parameter Details:**
 
-| **Argument**        | **Type** | **Default**  | **Description**                                              |
-| ------------------- | -------- | ------------ | ------------------------------------------------------------ |
-| `--model_path`      | `str`    | `yolo26n.pt` | Path to the original model (`.pt`).                          |
-| `--data`            | `str`    | `""`         | Dataset config (e.g., `coco128.yaml`). **If set, fine-tuning starts automatically after pruning.** |
-| `--speed_up`        | `str`    | `2.0`        | Target speed-up ratio (FLOPs reduction). E.g., `2.0` implies ~50% reduction in computation. |
-| `--prune_method`    | `str`    | `lamp`       | Pruning strategy: `lamp` (recommended), `l1`, `random`.      |
-| `--global_pruning`  | `bool`   | `True`       | Whether to enable global pruning (compare importance across layers). |
+| **Argument**        | **Type** | **Default**  | **Description**                                                                                          |
+| ------------------- | -------- | ------------ | -------------------------------------------------------------------------------------------------------- |
+| `--model_path`      | `str`    | `yolo26n.pt` | Path to the original model (`.pt`).                                                                      |
+| `--data`            | `str`    | `""`         | Dataset config (e.g., `coco128.yaml`). **If set, fine-tuning starts automatically after pruning.**       |
+| `--speed_up`        | `str`    | `2.0`        | Target speed-up ratio (FLOPs reduction). E.g., `2.0` implies ~50% reduction in computation.              |
+| `--prune_method`    | `str`    | `lamp`       | Pruning strategy: `lamp` (recommended), `l1`, `random`.                                                  |
+| `--global_pruning`  | `bool`   | `True`       | Whether to enable global pruning (compare importance across layers).                                     |
 | `--iterative_steps` | `int`    | `200`        | Steps for iterative pruning. More steps result in a smoother process and potentially less accuracy loss. |
-| `--imgsz`           | `int`    | `640`        | Input image size for calibration and fine-tuning.            |
+| `--imgsz`           | `int`    | `640`        | Input image size for calibration and fine-tuning.                                                        |
 
 ### 2. Benchmark (FPS)
 
@@ -99,12 +99,11 @@ python get_fps.py --weights pruned_model_lamp.pt --batch 32 --half
    - If you load the model within **this project directory**, the code will recognize it automatically.
    - If you load the weights in **another project**, you must ensure that the project contains the class definitions from `prune_module.py`, or export the pruned model to ONNX.
 
-
    ```Python
    # Example of loading the pruned model in another script
-   from prune_module import C2f_v2, C3k2_v2, C2PSA_v2 # Must import custom classes first
+   from prune_module import C2f_v2, C3k2_v2, C2PSA_v2  # Must import custom classes first
    from ultralytics import YOLO
-   
+
    model = YOLO("pruned_model.pt")
    ```
 
@@ -116,7 +115,7 @@ python get_fps.py --weights pruned_model_lamp.pt --batch 32 --half
    yolo export model=pruned_model.pt format=onnx opset=13
    ```
 
-## 🤝 Acknowledgements
+## 🤝 Acknowledgments
 
 - [Ultralytics YOLO](https://github.com/ultralytics/ultralytics)
 

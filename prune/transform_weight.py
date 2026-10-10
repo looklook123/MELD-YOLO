@@ -1,11 +1,11 @@
 import os
 
 import torch
-import torch.nn as nn
+from prune_module import C2f_v2, C2PSA_v2, C3k2_v2
+from torch import nn
+
 from ultralytics import YOLO
 from ultralytics.nn.modules.block import C2PSA, C2f, C3k, C3k2
-
-from prune_module import C2f_v2, C2PSA_v2, C3k2_v2
 
 
 def infer_shortcut(block):
@@ -85,7 +85,12 @@ def replace_C3k2_with_C3k2_v2(child_module):
 
 def replace_C2PSA_with_C2PSA_v2(child_module):
     """Convert C2PSA operator."""
-    c2PSA_v2 = C2PSA_v2(child_module.cv1.conv.in_channels, child_module.cv2.conv.out_channels, n=len(child_module.m), e=child_module.c / child_module.cv2.conv.out_channels)
+    c2PSA_v2 = C2PSA_v2(
+        child_module.cv1.conv.in_channels,
+        child_module.cv2.conv.out_channels,
+        n=len(child_module.m),
+        e=child_module.c / child_module.cv2.conv.out_channels,
+    )
     return c2PSA_v2
 
 
@@ -139,7 +144,7 @@ def transform_yolov8(module):
 
 def transform_model(model_path, transform_method):
     """
-    Model Transformation
+    Model Transformation.
 
     :param model_path: Path to the model
     :param transform_method: Method used for model transformation
