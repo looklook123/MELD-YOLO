@@ -16,7 +16,6 @@ Examples:
     >>> torch.onnx.export(m, x, f)
     >>> subprocess.run(f"onnxslim {f} {f} && open {f}", shell=True, check=True)  # pip install onnxslim
 """
-from .dysample import DySample
 
 from .block import (
     C1,
@@ -26,7 +25,11 @@ from .block import (
     C3TR,
     CIB,
     DFL,
+    ECA,
     ELAN1,
+    EMA,
+    GFM,
+    KCGM,
     PSA,
     SPP,
     SPPELAN,
@@ -53,21 +56,16 @@ from .block import (
     HGStem,
     ImagePoolingAttn,
     MaxSigmoidAttnBlock,
+    P3Suppress,
+    P4Enhance,
     Proto,
     RepC3,
     RepNCSPELAN4,
     RepVGGDW,
     ResNetLayer,
     SCDown,
-    TorchVision,
-
-    EMA,
-    ECA,
     SimAM,
-    P3Suppress,
-    P4Enhance,
-    KCGM, GFM
-
+    TorchVision,
 )
 from .conv import (
     CBAM,
@@ -85,6 +83,7 @@ from .conv import (
     RepConv,
     SpatialAttention,
 )
+from .dysample import DySample
 from .head import (
     OBB,
     OBB26,
@@ -126,7 +125,12 @@ __all__ = (
     "CBAM",
     "CIB",
     "DFL",
+    "ECA",
     "ELAN1",
+    # 新增模块
+    "EMA",
+    "GFM",
+    "KCGM",
     "MLP",
     "OBB",
     "OBB26",
@@ -188,6 +192,7 @@ __all__ = (
     "Segment",
     "Segment26",
     "SemanticSegment",
+    "SimAM",
     "SpatialAttention",
     "TorchVision",
     "TransformerBlock",
@@ -198,10 +203,4 @@ __all__ = (
     "YOLOESegment",
     "YOLOESegment26",
     "v10Detect",
-    # 新增模块
-    "EMA",
-    "ECA",
-    "SimAM",
-    "KCGM",
-    "GFM"
 )

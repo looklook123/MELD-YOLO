@@ -1,5 +1,5 @@
 import torch
-import torch.nn as nn
+from torch import nn
 
 from ultralytics.nn.modules.block import Bottleneck, C3k, PSABlock
 from ultralytics.nn.modules.conv import Conv
