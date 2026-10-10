@@ -5,7 +5,7 @@ val: valid/images
 test: test/images
 
 nc: 4
-names: ['blight', 'common_rust', 'gray_spot', 'health']
+names: ["blight", "common_rust", "gray_spot", "health"]
 
 roboflow:
   workspace: aziz-jda2k

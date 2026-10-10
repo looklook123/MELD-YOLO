@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import argparse
 import os
 import types
@@ -5,16 +7,16 @@ from copy import deepcopy
 from functools import partial
 
 import torch
-import torch.nn as nn
 import torch_pruning as tp
 import yaml
+from torch import nn
+from transform_weight import transform_model, transform_yolo11_yolo26, transform_yolov8
+
 from ultralytics import YOLO
 from ultralytics.models import yolo
 from ultralytics.nn.modules import Detect, v10Detect
 from ultralytics.nn.modules.block import PSA, AAttn, C3k2, PSABlock
 from ultralytics.utils import LOGGER, colorstr
-
-from transform_weight import transform_model, transform_yolo11_yolo26, transform_yolov8
 
 
 class DetectionFinetune(yolo.detect.DetectionTrainer):
@@ -39,7 +41,9 @@ class DetectionFinetune(yolo.detect.DetectionTrainer):
 def get_ignored_layers(model):
     """Get layers to be ignored for pruning based on the model architecture."""
 
-    def forward_for_pruning(self, x: list[torch.Tensor]) -> dict[str, torch.Tensor] | torch.Tensor | tuple[torch.Tensor, dict[str, torch.Tensor]]:
+    def forward_for_pruning(
+        self, x: list[torch.Tensor]
+    ) -> dict[str, torch.Tensor] | torch.Tensor | tuple[torch.Tensor, dict[str, torch.Tensor]]:
         """Concatenates and returns predicted bounding boxes and class probabilities."""
         preds = self.forward_head(x, **self.one2many)
         if self.end2end:
