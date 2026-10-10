@@ -1,0 +1,15 @@
+path: D:\DeepLearning\ultralytics-8.3.163\datasets\corn leaf diseases
+
+train: train/images
+val: valid/images
+test: test/images
+
+nc: 4
+names: ['blight', 'common_rust', 'gray_spot', 'health']
+
+roboflow:
+  workspace: aziz-jda2k
+  project: corn-leaf-disease-hgosu
+  version: 17
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/aziz-jda2k/corn-leaf-disease-hgosu/dataset/17
