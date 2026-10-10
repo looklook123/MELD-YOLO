@@ -8,7 +8,7 @@ from copy import deepcopy
 from pathlib import Path
 
 import torch
-import torch.nn as nn
+from torch import nn
 
 from ultralytics.nn.autobackend import check_class_names
 from ultralytics.nn.modules import (
@@ -19,6 +19,9 @@ from ultralytics.nn.modules import (
     C3,
     C3TR,
     ELAN1,
+    EMA,
+    GFM,
+    KCGM,
     OBB,
     OBB26,
     PSA,
@@ -72,8 +75,8 @@ from ultralytics.nn.modules import (
     YOLOEDetect,
     YOLOESegment,
     YOLOESegment26,
-    v10Detect, EMA,ECA,SimAM,dysample,P3Suppress,P4Enhance,
-    KCGM,GFM
+    dysample,
+    v10Detect,
 )
 from ultralytics.nn.modules.dysample import DySample
 from ultralytics.utils import DEFAULT_CFG_DICT, LOGGER, SETTINGS, WINDOWS, YAML, colorstr, emojis
@@ -1457,11 +1460,9 @@ class SafeClass:
 
     def __init__(self, *args, **kwargs):
         """Initialize SafeClass instance, ignoring all arguments."""
-        pass
 
     def __call__(self, *args, **kwargs):
         """Run SafeClass instance, ignoring all arguments."""
-        pass
 
 
 class SafeUnpickler(pickle.Unpickler):
@@ -1711,7 +1712,7 @@ def parse_model(d, ch, verbose=True):
             C2fCIB,
             A2C2f,
             EMA,
-            dysample
+            dysample,
         }
     )
     repeat_modules = frozenset(  # modules with 'repeat' arguments
@@ -1751,11 +1752,8 @@ def parse_model(d, ch, verbose=True):
             c2 = c1
             args = [c1, *args]
 
-
         elif m in base_modules:
-
             c1, c2 = ch[f], args[0]
-
 
             if c2 != nc:  # if c2 != nc (e.g., Classify() output)
                 c2 = make_divisible(min(c2, max_channels) * width, 8)
