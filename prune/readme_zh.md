@@ -43,15 +43,15 @@ python prune.py --model_path yolov8n.pt --data coco8.yaml --speed_up 2.0 --prune
 
 **参数说明：**
 
-| **参数**            | **类型** | **默认值**   | **说明**                                                     |
-| ------------------- | -------- | ------------ | ------------------------------------------------------------ |
-| `--model_path`      | `str`    | `yolo26n.pt` | 原始模型路径（`.pt`）。                                     |
+| **参数**            | **类型** | **默认值**   | **说明**                                                                          |
+| ------------------- | -------- | ------------ | --------------------------------------------------------------------------------- |
+| `--model_path`      | `str`    | `yolo26n.pt` | 原始模型路径（`.pt`）。                                                           |
 | `--data`            | `str`    | `""`         | 数据集配置文件（例如 `coco128.yaml`）。**如果设置该参数，剪枝后会自动开始微调。** |
-| `--speed_up`        | `str`    | `2.0`        | 目标加速比例（FLOPs 缩减）。例如 `2.0` 表示计算量约减少 50%。 |
-| `--prune_method`    | `str`    | `lamp`       | 剪枝策略：`lamp`（推荐）、`l1`、`random`。                   |
-| `--global_pruning`  | `bool`   | `True`       | 是否启用全局剪枝（跨层比较重要性）。                         |
-| `--iterative_steps` | `int`    | `200`        | 迭代剪枝步数。步数越多，剪枝过程越平滑，可能带来更小的精度损失。 |
-| `--imgsz`           | `int`    | `640`        | 用于校准和微调的输入图像尺寸。                               |
+| `--speed_up`        | `str`    | `2.0`        | 目标加速比例（FLOPs 缩减）。例如 `2.0` 表示计算量约减少 50%。                     |
+| `--prune_method`    | `str`    | `lamp`       | 剪枝策略：`lamp`（推荐）、`l1`、`random`。                                        |
+| `--global_pruning`  | `bool`   | `True`       | 是否启用全局剪枝（跨层比较重要性）。                                              |
+| `--iterative_steps` | `int`    | `200`        | 迭代剪枝步数。步数越多，剪枝过程越平滑，可能带来更小的精度损失。                  |
+| `--imgsz`           | `int`    | `640`        | 用于校准和微调的输入图像尺寸。                                                    |
 
 ### 2. 基准测试（FPS）
 
@@ -97,15 +97,14 @@ python get_fps.py --weights pruned_model_lamp.pt --batch 32 --half
    - 如果在**本项目目录**中加载模型，代码会自动识别这些模块。
    - 如果在**其他项目**中加载权重，必须确保该项目包含来自 `prune_module.py` 的类定义，或者将剪枝后的模型导出为 ONNX。
 
-
    ```Python
    # 在其他脚本中加载剪枝模型的示例
-   from prune_module import C2f_v2, C3k2_v2, C2PSA_v2 # 必须先导入自定义类
+   from prune_module import C2f_v2, C3k2_v2, C2PSA_v2  # 必须先导入自定义类
    from ultralytics import YOLO
-   
+
    model = YOLO("pruned_model.pt")
    ```
-   
+
 2. **导出为 ONNX**
 
    剪枝后的模型支持导出为 ONNX。导出后，模型不再依赖自定义 Python 代码，适合用于部署。
