@@ -7,8 +7,8 @@ from pathlib import Path
 from typing import Any
 
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
+from torch import nn
 
 from ultralytics.utils.metrics import CITYSCAPES_WEIGHT, OKS_SIGMA, RLE_WEIGHT
 from ultralytics.utils.ops import crop_mask, xywh2xyxy, xyxy2xywh
@@ -17,6 +17,7 @@ from ultralytics.utils.torch_utils import autocast
 
 from .metrics import bbox_iou, probiou
 from .tal import bbox2dist, rbox2dist
+
 
 class VarifocalLoss(nn.Module):
     """Varifocal loss by Zhang et al.
@@ -107,7 +108,6 @@ class DFLoss(nn.Module):
 
 
 class BboxLoss(nn.Module):
-
     def __init__(self, reg_max=16):
         super().__init__()
 
@@ -133,8 +133,8 @@ class BboxLoss(nn.Module):
         iou = bbox_iou(
             pred_bboxes[fg_mask],
             target_bboxes[fg_mask],
-            xywh = False,
-            CIoU = True,
+            xywh=False,
+            CIoU=True,
         )
 
         loss_iou = ((1.0 - iou) * weight).sum() / target_scores_sum
