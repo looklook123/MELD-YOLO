@@ -1,5 +1,6 @@
-import os
 import glob
+import os
+
 import numpy as np
 
 # ============================================================
@@ -19,11 +20,9 @@ IOU_THRESHOLDS = np.arange(0.50, 0.96, 0.05)
 # Utilities
 # ============================================================
 
+
 def load_gt(txt_path):
-    """
-    YOLO label:
-    class cx cy w h
-    normalized [0,1]
+    """YOLO label: class cx cy w h normalized [0,1].
 
     Convert to pixel coordinates assuming 640x640.
     """
@@ -32,7 +31,7 @@ def load_gt(txt_path):
     if not os.path.exists(txt_path):
         return gts
 
-    with open(txt_path, "r") as f:
+    with open(txt_path) as f:
         for line in f:
             line = line.strip()
 
@@ -54,25 +53,20 @@ def load_gt(txt_path):
             x2 = cx + w / 2.0
             y2 = cy + h / 2.0
 
-            gts.append({
-                "class": cls,
-                "box": [x1, y1, x2, y2]
-            })
+            gts.append({"class": cls, "box": [x1, y1, x2, y2]})
 
     return gts
 
 
 def load_pred(txt_path):
-    """
-    Prediction:
-    class confidence x1 y1 x2 y2
+    """Prediction: class confidence x1 y1 x2 y2.
     """
     preds = []
 
     if not os.path.exists(txt_path):
         return preds
 
-    with open(txt_path, "r") as f:
+    with open(txt_path) as f:
         for line in f:
             line = line.strip()
 
@@ -91,19 +85,13 @@ def load_pred(txt_path):
             x2 = float(parts[4])
             y2 = float(parts[5])
 
-            preds.append({
-                "class": cls,
-                "score": score,
-                "box": [x1, y1, x2, y2]
-            })
+            preds.append({"class": cls, "score": score, "box": [x1, y1, x2, y2]})
 
     return preds
 
 
 def box_iou(box1, box2):
-    """
-    box = [x1,y1,x2,y2]
-    """
+    """Box = [x1,y1,x2,y2]."""
     x1 = max(box1[0], box2[0])
     y1 = max(box1[1], box2[1])
     x2 = min(box1[2], box2[2])
@@ -114,11 +102,9 @@ def box_iou(box1, box2):
 
     inter = iw * ih
 
-    area1 = max(0.0, box1[2] - box1[0]) * \
-            max(0.0, box1[3] - box1[1])
+    area1 = max(0.0, box1[2] - box1[0]) * max(0.0, box1[3] - box1[1])
 
-    area2 = max(0.0, box2[2] - box2[0]) * \
-            max(0.0, box2[3] - box2[1])
+    area2 = max(0.0, box2[2] - box2[0]) * max(0.0, box2[3] - box2[1])
 
     union = area1 + area2 - inter
 
@@ -129,9 +115,7 @@ def box_iou(box1, box2):
 
 
 def compute_ap(recall, precision):
-    """
-    COCO-style 101-point interpolated AP.
-    """
+    """COCO-style 101-point interpolated AP."""
     mrec = np.concatenate(([0.0], recall, [1.0]))
     mpre = np.concatenate(([1.0], precision, [0.0]))
 
@@ -179,24 +163,14 @@ print()
 dataset = []
 
 for label_path in label_files:
+    name = os.path.splitext(os.path.basename(label_path))[0]
 
-    name = os.path.splitext(
-        os.path.basename(label_path)
-    )[0]
-
-    pred_path = os.path.join(
-        PRED_DIR,
-        name + ".txt"
-    )
+    pred_path = os.path.join(PRED_DIR, name + ".txt")
 
     gts = load_gt(label_path)
     preds = load_pred(pred_path)
 
-    dataset.append({
-        "name": name,
-        "gts": gts,
-        "preds": preds
-    })
+    dataset.append({"name": name, "gts": gts, "preds": preds})
 
 
 # ============================================================
@@ -213,11 +187,9 @@ class_p = []
 class_r = []
 
 for cls in range(NUM_CLASSES):
-
     cls_aps = []
 
     for ti, iou_thr in enumerate(IOU_THRESHOLDS):
-
         # ----------------------------------------------------
         # Gather all predictions of this class
         # ----------------------------------------------------
@@ -227,32 +199,17 @@ for cls in range(NUM_CLASSES):
         total_gt = 0
 
         for item in dataset:
+            gts_cls = [g for g in item["gts"] if g["class"] == cls]
 
-            gts_cls = [
-                g for g in item["gts"]
-                if g["class"] == cls
-            ]
-
-            preds_cls = [
-                p for p in item["preds"]
-                if p["class"] == cls
-            ]
+            preds_cls = [p for p in item["preds"] if p["class"] == cls]
 
             total_gt += len(gts_cls)
 
             for p in preds_cls:
-                records.append({
-                    "score": p["score"],
-                    "box": p["box"],
-                    "image": item["name"],
-                    "matched": False
-                })
+                records.append({"score": p["score"], "box": p["box"], "image": item["name"], "matched": False})
 
         # Sort confidence descending
-        records.sort(
-            key=lambda x: x["score"],
-            reverse=True
-        )
+        records.sort(key=lambda x: x["score"], reverse=True)
 
         tp = np.zeros(len(records))
         fp = np.zeros(len(records))
@@ -264,24 +221,14 @@ for cls in range(NUM_CLASSES):
         gt_used = {}
 
         for i, rec in enumerate(records):
-
             image_name = rec["image"]
 
-            item = next(
-                x for x in dataset
-                if x["name"] == image_name
-            )
+            item = next(x for x in dataset if x["name"] == image_name)
 
-            gts_cls = [
-                g for g in item["gts"]
-                if g["class"] == cls
-            ]
+            gts_cls = [g for g in item["gts"] if g["class"] == cls]
 
             if image_name not in gt_used:
-                gt_used[image_name] = np.zeros(
-                    len(gts_cls),
-                    dtype=bool
-                )
+                gt_used[image_name] = np.zeros(len(gts_cls), dtype=bool)
 
             used = gt_used[image_name]
 
@@ -289,14 +236,10 @@ for cls in range(NUM_CLASSES):
             best_idx = -1
 
             for gi, gt in enumerate(gts_cls):
-
                 if used[gi]:
                     continue
 
-                iou = box_iou(
-                    rec["box"],
-                    gt["box"]
-                )
+                iou = box_iou(rec["box"], gt["box"])
 
                 if iou >= best_iou:
                     best_iou = iou
@@ -312,10 +255,7 @@ for cls in range(NUM_CLASSES):
         # AP
         # ----------------------------------------------------
 
-        if total_gt == 0:
-            ap = 0.0
-
-        elif len(records) == 0:
+        if total_gt == 0 or len(records) == 0:
             ap = 0.0
 
         else:
@@ -324,15 +264,9 @@ for cls in range(NUM_CLASSES):
 
             recall = tp_cum / max(total_gt, 1)
 
-            precision = tp_cum / np.maximum(
-                tp_cum + fp_cum,
-                1e-12
-            )
+            precision = tp_cum / np.maximum(tp_cum + fp_cum, 1e-12)
 
-            ap = compute_ap(
-                recall,
-                precision
-            )
+            ap = compute_ap(recall, precision)
 
         all_ap[cls, ti] = ap
         cls_aps.append(ap)
@@ -342,24 +276,19 @@ for cls in range(NUM_CLASSES):
         # ----------------------------------------------------
 
         if abs(iou_thr - 0.50) < 1e-6:
-
             total_tp_50 += int(np.sum(tp))
             total_fp_50 += int(np.sum(fp))
             total_fn_50 += total_gt - int(np.sum(tp))
 
             if total_gt > 0:
-                class_r.append(
-                    np.sum(tp) / total_gt
-                )
+                class_r.append(np.sum(tp) / total_gt)
             else:
                 class_r.append(0.0)
 
             denom = np.sum(tp) + np.sum(fp)
 
             if denom > 0:
-                class_p.append(
-                    np.sum(tp) / denom
-                )
+                class_p.append(np.sum(tp) / denom)
             else:
                 class_p.append(0.0)
 
@@ -374,15 +303,9 @@ mAP95_per_class = np.mean(all_ap, axis=1)
 mAP50 = np.mean(mAP50_per_class)
 mAP5095 = np.mean(mAP95_per_class)
 
-precision = (
-    total_tp_50 /
-    max(total_tp_50 + total_fp_50, 1)
-)
+precision = total_tp_50 / max(total_tp_50 + total_fp_50, 1)
 
-recall = (
-    total_tp_50 /
-    max(total_tp_50 + total_fn_50, 1)
-)
+recall = total_tp_50 / max(total_tp_50 + total_fn_50, 1)
 
 
 # ============================================================
@@ -393,21 +316,13 @@ print("=" * 60)
 print(" Overall Metrics")
 print("=" * 60)
 
-print(
-    f"Precision       : {precision:.6f}"
-)
+print(f"Precision       : {precision:.6f}")
 
-print(
-    f"Recall          : {recall:.6f}"
-)
+print(f"Recall          : {recall:.6f}")
 
-print(
-    f"mAP50           : {mAP50:.6f}"
-)
+print(f"mAP50           : {mAP50:.6f}")
 
-print(
-    f"mAP50-95        : {mAP5095:.6f}"
-)
+print(f"mAP50-95        : {mAP5095:.6f}")
 
 print()
 
@@ -416,7 +331,6 @@ print(" Per-Class Metrics")
 print("=" * 60)
 
 for cls in range(NUM_CLASSES):
-
     print(
         f"Class {cls}: "
         f"P={class_p[cls]:.6f}, "
