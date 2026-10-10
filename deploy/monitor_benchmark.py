@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 
 import os
-import sys
-import time
 import signal
 import subprocess
+import sys
+import time
 
 INTERVAL = 0.5
 NUM_CPUS = os.cpu_count() or 4
 
 
 def read_proc_stat():
-    with open("/proc/stat", "r") as f:
+    with open("/proc/stat") as f:
         line = f.readline().strip()
 
     parts = line.split()
@@ -28,12 +28,12 @@ def read_proc_stat():
 
 
 def read_process_cpu_time(pid):
-    with open(f"/proc/{pid}/stat", "r") as f:
+    with open(f"/proc/{pid}/stat") as f:
         data = f.read()
 
     # comm can contain spaces/parentheses, so split after last ")"
     right = data.rfind(")")
-    fields = data[right + 2:].split()
+    fields = data[right + 2 :].split()
 
     # After removing pid + comm, field index:
     # original field 14 -> fields[11]
@@ -46,7 +46,7 @@ def read_process_cpu_time(pid):
 
 def read_rss_mb(pid):
     try:
-        with open(f"/proc/{pid}/status", "r") as f:
+        with open(f"/proc/{pid}/status") as f:
             for line in f:
                 if line.startswith("VmRSS:"):
                     kb = int(line.split()[1])
@@ -84,12 +84,10 @@ def main():
     prev_total, prev_idle = read_proc_stat()
     prev_proc = read_process_cpu_time(process.pid)
 
-    clk_tck = os.sysconf(os.sysconf_names["SC_CLK_TCK"])
+    os.sysconf(os.sysconf_names["SC_CLK_TCK"])
 
     try:
-
         while process.poll() is None:
-
             time.sleep(INTERVAL)
 
             try:
@@ -100,7 +98,7 @@ def main():
                 break
 
             delta_total = total - prev_total
-            delta_idle = idle - prev_idle
+            idle - prev_idle
             delta_proc = proc_time - prev_proc
 
             prev_total = total
@@ -108,7 +106,6 @@ def main():
             prev_proc = proc_time
 
             if delta_total > 0:
-
                 # Process CPU usage relative to whole machine.
                 #
                 # Process CPU time is measured in clock ticks.
@@ -116,9 +113,7 @@ def main():
                 #
                 # Therefore this value is already normalized:
                 # 100% = all CPU capacity.
-                cpu_percent = (
-                    delta_proc / delta_total
-                ) * 100.0
+                cpu_percent = (delta_proc / delta_total) * 100.0
 
             else:
                 cpu_percent = 0.0
@@ -127,7 +122,6 @@ def main():
             samples_rss.append(rss)
 
     except KeyboardInterrupt:
-
         print("\nInterrupted.")
 
         try:
@@ -146,7 +140,6 @@ def main():
     print("=" * 60)
 
     if samples_cpu:
-
         avg_cpu = sum(samples_cpu) / len(samples_cpu)
         peak_cpu = max(samples_cpu)
 
@@ -160,7 +153,6 @@ def main():
         print(f"Samples                 : {len(samples_cpu)}")
 
     else:
-
         print("No monitoring samples collected.")
 
     print(f"Process elapsed time    : {elapsed:.2f} s")
